@@ -20,7 +20,7 @@ ShellRoot {
 
     // Font
     property string fontFamily: "Noto Sans"
-    property int fontSize: 14
+    property int fontSize: 12
 
     // System info properties
     property int cpuUsage: 0
@@ -266,9 +266,19 @@ ShellRoot {
                         font.family: root.fontFamily
                         font.bold: true
                         Layout.fillWidth: true
+                        Layout.maximumWidth: 400
                         Layout.leftMargin: 8
                         elide: Text.ElideRight
                         maximumLineCount: 1
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 16
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.leftMargin: 8
+                        Layout.rightMargin: 8
+                        color: "transparent"
                     }
 
                     Text {
