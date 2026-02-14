@@ -1,19 +1,28 @@
-import Quickshell // for PanelWindow
-import QtQuick // for Text
+// Bar.qml
+import Quickshell
 
-PanelWindow {
-  anchors {
-    top: true
-    left: true
-    right: true
-  }
+Scope {
+  Variants {
+    model: Quickshell.screens
 
-  implicitHeight: 30
+    PanelWindow {
+      required property var modelData
+      screen: modelData
 
-  Text {
-    // center the bar in its parent component (the window)
-    anchors.centerIn: parent
+      color: "black"
 
-    text: "hello world"
+      anchors {
+        top: true
+        left: true
+        right: true
+      }
+
+      implicitHeight: 30
+
+      ClockWidget {
+        anchors.centerIn: parent
+        color: "white"
+      }
+    }
   }
 }
