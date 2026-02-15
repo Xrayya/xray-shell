@@ -353,21 +353,18 @@ ShellRoot {
                         color: root.colMuted
                     }
 
+                    SystemClock {
+                      id: systemClock
+                    }
+
                     Text {
                         id: clockText
-                        text: Qt.formatDateTime(new Date(), "ddd, MMM dd - HH:mm")
+                        text: Qt.formatDateTime(systemClock.date, "HH:mm - MMM dd")
                         color: root.colCyan
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
-
-                        Timer {
-                            interval: 1000
-                            running: true
-                            repeat: true
-                            onTriggered: clockText.text = Qt.formatDateTime(new Date(), "ddd, MMM dd - HH:mm")
-                        }
                     }
 
                     Item {
