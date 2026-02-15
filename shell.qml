@@ -229,6 +229,7 @@ ShellRoot {
 
                                 RowLayout {
                                     id: workspaceRow
+                                    implicitHeight: parent.height
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: 4
 
@@ -241,15 +242,34 @@ ShellRoot {
                                     }
 
                                     RowLayout {
+                                        implicitHeight: parent.height
                                         spacing: 4
 
                                         Repeater {
                                             model: modelData.toplevels
 
-                                            IconImage {
-                                                source: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland.appId).icon) || ""
-                                                width: 16
-                                                height: 16
+                                            Rectangle {
+                                              implicitWidth: appIcon.width
+                                              implicitHeight: parent.height
+                                                color: "transparent"
+
+                                                IconImage {
+                                                    id: appIcon
+                                                    source: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland.appId).icon) || ""
+                                                    width: 16
+                                                    height: 16
+                                                    anchors.centerIn: parent
+                                                }
+
+                                                Rectangle {
+                                                    anchors.left: parent.left
+                                                    anchors.right: parent.right
+                                                    anchors.bottom: parent.bottom 
+                                                    anchors.bottomMargin: 3
+                                                    height: 2
+                                                    color: modelData.activated ? root.colYellow : "transparent"
+                                                    // isActiveWindow: boolean, tentukan sendiri logikanya
+                                                }
                                             }
                                         }
                                     }
@@ -257,7 +277,7 @@ ShellRoot {
 
                                 Rectangle {
                                     width: parent.width
-                                    height: 1
+                                    height: 2
                                     color: modelData.active ? root.colPurple : "transparent"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.bottom: parent.bottom
