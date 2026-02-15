@@ -255,10 +255,14 @@ ShellRoot {
                                         spacing: 4
 
                                         Repeater {
-                                            model: modelData.toplevels.values ? modelData.toplevels.values.slice().sort((a, b) => {
-                                                var score = a.lastIpcObject.at[0] - b.lastIpcObject.at[0];
-                                                return score != 0 ? score : a.lastIpcObject.at[1] - b.lastIpcObject.at[1];
-                                            }) : []
+                                            model: {
+                                                return modelData.toplevels.values ? modelData.toplevels.values.slice().sort((a, b) => {
+                                                    var aValue = a.lastIpcObject && a.lastIpcObject.at && a.lastIpcObject.at[0] ? a.lastIpcObject.at[0] : 0;
+                                                    var bValue = b.lastIpcObject && b.lastIpcObject.at && b.lastIpcObject.at[0] ? b.lastIpcObject.at[0] : 0;
+                                                    var score = aValue - bValue;
+                                                    return score != 0 ? score : bValue - aValue;
+                                                }) : [];
+                                            }
 
                                             Rectangle {
                                                 implicitWidth: appIcon.width
@@ -267,7 +271,10 @@ ShellRoot {
 
                                                 IconImage {
                                                     id: appIcon
-                                                    source: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland.appId).icon) || ""
+                                                    source: {
+                                                        var entry = modelData.wayland && modelData.wayland.appId && DesktopEntries.heuristicLookup(modelData.wayland.appId)
+                                                        return Quickshell.iconPath(entry && entry.icon, "application-x-executable");
+                                                    }
                                                     width: 16
                                                     height: 16
                                                     anchors.centerIn: parent
