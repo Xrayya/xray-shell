@@ -35,30 +35,6 @@ ShellRoot {
     property var lastCpuIdle: 0
     property var lastCpuTotal: 0
 
-    function dumpObject(obj, depth = 0) {
-        if (depth > 4) // avoid infinite recursion
-            return '[MaxDepth]';
-        if (obj === null)
-            return 'null';
-        if (typeof obj !== 'object')
-            return obj;
-        let out = '{ ';
-        for (let k in obj) {
-            try {
-                out += k + ': ';
-                if (typeof obj[k] === 'object' && obj[k] !== null)
-                    out += dumpObject(obj[k], depth + 1);
-                else
-                    out += obj[k];
-                out += ', ';
-            } catch (e) {
-                out += k + ': [unreadable], ';
-            }
-        }
-        out += '}';
-        return out;
-    }
-
     // CPU usage
     Process {
         id: cpuProc
@@ -323,6 +299,14 @@ ShellRoot {
                                     onClicked: Hyprland.dispatch("workspace " + modelData.id)
                                 }
                             }
+                        }
+                    }
+
+                    Connections {
+                        target: Hyprland
+                        function onRawEvent(event) {
+                            Hyprland.refreshToplevels();
+                            windowProc.running = true;
                         }
                     }
 
