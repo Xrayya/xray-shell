@@ -272,7 +272,7 @@ ShellRoot {
                                                 IconImage {
                                                     id: appIcon
                                                     source: {
-                                                        var entry = modelData.wayland && modelData.wayland.appId && DesktopEntries.heuristicLookup(modelData.wayland.appId)
+                                                        var entry = modelData.wayland && modelData.wayland.appId && DesktopEntries.heuristicLookup(modelData.wayland.appId);
                                                         return Quickshell.iconPath(entry && entry.icon, "application-x-executable");
                                                     }
                                                     width: 16
@@ -291,6 +291,7 @@ ShellRoot {
 
                                                 MouseArea {
                                                     anchors.fill: parent
+                                                    cursorShape: Qt.PointingHandCursor
                                                     onClicked: Hyprland.dispatch("focuswindow address:0x" + modelData.address)
                                                 }
                                             }
@@ -308,6 +309,7 @@ ShellRoot {
 
                                 // MouseArea {
                                 //     anchors.fill: parent
+                                //     cursorShape: Qt.PointingHandCursor
                                 //     onClicked: Hyprland.focusedWorkspace.id !== modelData.id && Hyprland.dispatch("workspace " + modelData.id)
                                 // }
                             }
