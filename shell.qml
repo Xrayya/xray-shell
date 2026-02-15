@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import QtQuick
 import QtQuick.Layouts
 
@@ -214,40 +215,58 @@ ShellRoot {
                         width: 8
                     }
 
-                    Repeater {
-                        model: Hyprland.workspaces
+                    RowLayout {
+                        implicitHeight: parent.height
+                        spacing: 6
 
-                        Rectangle {
-                            Layout.preferredWidth: 20
-                            Layout.preferredHeight: parent.height
-                            color: "transparent"
-
-                            Text {
-                                text: `${modelData.id}:`
-                                color: root.colCyan
-                                font.pixelSize: root.fontSize
-                                font.family: root.fontFamily
-                                font.bold: true
-                                anchors.centerIn: parent
-                            }
+                        Repeater {
+                            model: Hyprland.workspaces
 
                             Rectangle {
-                                width: 20
-                                height: 3
-                                color: modelData.active ? root.colPurple : root.colBg
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
-                            }
+                                implicitWidth: workspaceRow.implicitWidth
+                                implicitHeight: parent.height
+                                color: "transparent"
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: Hyprland.dispatch("workspace " + modelData.id)
-                            }
+                                RowLayout {
+                                    id: workspaceRow
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 4
 
-                            Component.onCompleted: {
-                                modelData.toplevels.values.forEach(w => {
-                                    console.log(`ws-${modelData.id}, w: ${w.title}, appId: ${w.wayland.appId}, desktopEntry: ${DesktopEntries.heuristicLookup(w.wayland.appId).icon}`);
-                                });
+                                    Text {
+                                        text: `${modelData.id}:`
+                                        color: root.colCyan
+                                        font.pixelSize: root.fontSize
+                                        font.family: root.fontFamily
+                                        font.bold: true
+                                    }
+
+                                    RowLayout {
+                                        spacing: 4
+
+                                        Repeater {
+                                            model: modelData.toplevels
+
+                                            IconImage {
+                                                source: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland.appId).icon) || ""
+                                                width: 16
+                                                height: 16
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: modelData.active ? root.colPurple : "transparent"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: Hyprland.dispatch("workspace " + modelData.id)
+                                }
                             }
                         }
                     }
