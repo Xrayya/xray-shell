@@ -288,6 +288,11 @@ ShellRoot {
                                                     width: parent.implicitWidth * 0.5
                                                     color: modelData.activated ? root.colYellow : "transparent"
                                                 }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: Hyprland.dispatch("focuswindow address:0x" + modelData.address)
+                                                }
                                             }
                                         }
                                     }
@@ -301,10 +306,10 @@ ShellRoot {
                                     anchors.bottom: parent.bottom
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: Hyprland.dispatch("workspace " + modelData.id)
-                                }
+                                // MouseArea {
+                                //     anchors.fill: parent
+                                //     onClicked: Hyprland.focusedWorkspace.id !== modelData.id && Hyprland.dispatch("workspace " + modelData.id)
+                                // }
                             }
                         }
                     }
