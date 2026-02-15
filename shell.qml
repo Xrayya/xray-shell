@@ -35,6 +35,30 @@ ShellRoot {
     property var lastCpuIdle: 0
     property var lastCpuTotal: 0
 
+    function dumpObject(obj, depth = 0) {
+        if (depth > 4) // avoid infinite recursion
+            return '[MaxDepth]';
+        if (obj === null)
+            return 'null';
+        if (typeof obj !== 'object')
+            return obj;
+        let out = '{ ';
+        for (let k in obj) {
+            try {
+                out += k + ': ';
+                if (typeof obj[k] === 'object' && obj[k] !== null)
+                    out += dumpObject(obj[k], depth + 1);
+                else
+                    out += obj[k];
+                out += ', ';
+            } catch (e) {
+                out += k + ': [unreadable], ';
+            }
+        }
+        out += '}';
+        return out;
+    }
+
     // CPU usage
     Process {
         id: cpuProc
@@ -207,12 +231,21 @@ ShellRoot {
                     anchors.fill: parent
                     spacing: 0
 
-                    Item {
-                        width: 8
+                    Text {
+                        text: activeWindow
+                        color: root.colPurple
+                        font.pixelSize: root.fontSize
+                        font.family: root.fontFamily
+                        font.bold: true
+                        Layout.fillWidth: true
+                        Layout.maximumWidth: 400
+                        Layout.leftMargin: 8
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
                     }
 
                     Item {
-                        width: 8
+                        Layout.fillWidth: true
                     }
 
                     RowLayout {
@@ -246,11 +279,14 @@ ShellRoot {
                                         spacing: 4
 
                                         Repeater {
-                                            model: modelData.toplevels
+                                            model: modelData.toplevels.values ? modelData.toplevels.values.slice().sort((a, b) => {
+                                                var score = a.lastIpcObject.at[0] - b.lastIpcObject.at[0];
+                                                return score != 0 ? score : a.lastIpcObject.at[1] - b.lastIpcObject.at[1];
+                                            }) : []
 
                                             Rectangle {
-                                              implicitWidth: appIcon.width
-                                              implicitHeight: parent.height
+                                                implicitWidth: appIcon.width
+                                                implicitHeight: parent.height
                                                 color: "transparent"
 
                                                 IconImage {
@@ -262,13 +298,12 @@ ShellRoot {
                                                 }
 
                                                 Rectangle {
-                                                    anchors.left: parent.left
-                                                    anchors.right: parent.right
-                                                    anchors.bottom: parent.bottom 
+                                                    anchors.horizontalCenter: parent.horizontalCenter
+                                                    anchors.bottom: parent.bottom
                                                     anchors.bottomMargin: 3
                                                     height: 2
+                                                    width: parent.implicitWidth * 0.5
                                                     color: modelData.activated ? root.colYellow : "transparent"
-                                                    // isActiveWindow: boolean, tentukan sendiri logikanya
                                                 }
                                             }
                                         }
@@ -291,35 +326,8 @@ ShellRoot {
                         }
                     }
 
-                    Rectangle {
-                        Layout.preferredWidth: 1
-                        Layout.preferredHeight: 16
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 8
-                        color: root.colMuted
-                    }
-
-                    Text {
-                        text: activeWindow
-                        color: root.colPurple
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
-                        font.bold: true
+                    Item {
                         Layout.fillWidth: true
-                        Layout.maximumWidth: 400
-                        Layout.leftMargin: 8
-                        elide: Text.ElideRight
-                        maximumLineCount: 1
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 16
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.leftMargin: 8
-                        Layout.rightMargin: 8
-                        color: "transparent"
                     }
 
                     Text {
