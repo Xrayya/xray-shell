@@ -268,8 +268,9 @@ ShellRoot {
                             Rectangle {
                                 id: workspaceRect
                                 implicitWidth: workspaceRow.implicitWidth
+                                implicitHeight: parent.height
                                 Layout.fillHeight: true
-                                color: "transparent"
+                                color: "green"
 
                                 required property var modelData
 
@@ -304,8 +305,9 @@ ShellRoot {
                                             Rectangle {
                                                 id: windowRect
                                                 implicitWidth: appIcon.width
+                                                implicitHeight: parent.height
                                                 Layout.fillHeight: true
-                                                color: "transparent"
+                                                color: "red"
 
                                                 required property var modelData
 
