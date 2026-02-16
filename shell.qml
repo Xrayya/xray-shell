@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Widgets
+import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
 
@@ -104,20 +105,6 @@ ShellRoot {
         Component.onCompleted: running = true
     }
 
-    // Active window title
-    Process {
-        id: windowProc
-        command: ["sh", "-c", "hyprctl activewindow -j | jq -r '.title // empty'"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (data && data.trim()) {
-                    root.activeWindow = data.trim();
-                }
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
     // Battery level
     Process {
         id: batteryProc
@@ -159,6 +146,24 @@ ShellRoot {
         }
     }
 
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            Hyprland.refreshToplevels();
+        }
+    }
+
+    Connections {
+        target: DesktopEntries
+        function applicationsChanged() {
+            Hyprland.refreshToplevels();
+        }
+    }
+
+    PwObjectTracker {
+        objects: Pipewire.ready ? [Pipewire.preferredDefaultAudioSink] : []
+    }
+
     function dumpObject(obj, depth = 0) {
         if (depth > 4) // avoid infinite recursion
             return '[MaxDepth]';
@@ -181,31 +186,6 @@ ShellRoot {
         }
         out += '}';
         return out;
-    }
-
-    Connections {
-        target: Hyprland
-        function onRawEvent(event) {
-            Hyprland.refreshToplevels();
-            windowProc.running = true;
-        }
-    }
-
-    Connections {
-        target: DesktopEntries
-        function applicationsChanged() {
-            Hyprland.refreshToplevels();
-        }
-    }
-
-    // Backup timer for window/layout (catches edge cases)
-    Timer {
-        interval: 200
-        running: true
-        repeat: true
-        onTriggered: {
-            windowProc.running = true;
-        }
     }
 
     Variants {
@@ -240,9 +220,9 @@ ShellRoot {
                     spacing: 0
 
                     Text {
-                        text: root.activeWindow
+                        text: Hyprland.activeToplevel?.title || ""
                         color: root.colPurple
-                        font.pixelSize: root.fontSize
+                        // font.pixelSize: root.fontSize
                         font.family: root.fontFamily
                         font.bold: true
                         Layout.fillWidth: true
@@ -291,12 +271,12 @@ ShellRoot {
 
                                         Repeater {
                                             model: {
-                                                return workspaceRect.modelData.toplevels.values ? workspaceRect.modelData.toplevels.values.slice().sort((a, b) => {
-                                                    const aValue = a.lastIpcObject && a.lastIpcObject.at && a.lastIpcObject.at[0] ? a.lastIpcObject.at[0] : 0;
-                                                    const bValue = b.lastIpcObject && b.lastIpcObject.at && b.lastIpcObject.at[0] ? b.lastIpcObject.at[0] : 0;
+                                                return workspaceRect.modelData.toplevels.values?.slice().sort((a, b) => {
+                                                    const aValue = a.lastIpcObject?.at?.[0] || 0;
+                                                    const bValue = b.lastIpcObject?.at?.[0] || 0;
                                                     const score = aValue - bValue;
                                                     return score !== 0 ? score : bValue - aValue;
-                                                }) : [];
+                                                }) || [];
                                             }
 
                                             Rectangle {
@@ -310,8 +290,7 @@ ShellRoot {
                                                 IconImage {
                                                     id: appIcon
                                                     source: {
-                                                        const entry = windowRect.modelData.wayland && windowRect.modelData.wayland.appId && DesktopEntries.heuristicLookup(windowRect.modelData.wayland.appId);
-                                                        return Quickshell.iconPath(entry && entry.icon, "application-x-executable");
+                                                        return Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, "application-x-executable");
                                                     }
                                                     implicitWidth: 16
                                                     implicitHeight: 16
@@ -395,7 +374,7 @@ ShellRoot {
                     }
 
                     Text {
-                        text: "Vol: " + root.volumeLevel + "%"
+                        text: `Vol: ${Math.floor((Pipewire.preferredDefaultAudioSink?.audio.volume || 0) * 100)}%`
                         color: root.colPurple
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
