@@ -292,6 +292,7 @@ ShellRoot {
                                                     source: {
                                                         return Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, "application-x-executable");
                                                     }
+                                                    asynchronous: true
                                                     implicitWidth: 16
                                                     implicitHeight: 16
                                                     anchors.centerIn: parent
