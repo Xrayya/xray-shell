@@ -257,7 +257,6 @@ ShellRoot {
                     }
 
                     RowLayout {
-                        implicitHeight: parent.height
                         spacing: 6
 
                         Repeater {
@@ -268,16 +267,15 @@ ShellRoot {
                             Rectangle {
                                 id: workspaceRect
                                 implicitWidth: workspaceRow.implicitWidth
-                                implicitHeight: parent.height
                                 Layout.fillHeight: true
-                                color: "green"
+                                color: "transparent"
 
                                 required property var modelData
 
                                 RowLayout {
                                     id: workspaceRow
-                                    implicitHeight: parent.height
                                     anchors.verticalCenter: parent.verticalCenter
+                                    height: parent.height
                                     spacing: 4
 
                                     Text {
@@ -289,7 +287,6 @@ ShellRoot {
                                     }
 
                                     RowLayout {
-                                        implicitHeight: parent.height
                                         spacing: 4
 
                                         Repeater {
@@ -304,10 +301,9 @@ ShellRoot {
 
                                             Rectangle {
                                                 id: windowRect
-                                                implicitWidth: appIcon.width
-                                                implicitHeight: parent.height
+                                                implicitWidth: appIcon.implicitWidth
                                                 Layout.fillHeight: true
-                                                color: "red"
+                                                color: "transparent"
 
                                                 required property var modelData
 
@@ -317,8 +313,8 @@ ShellRoot {
                                                         const entry = windowRect.modelData.wayland && windowRect.modelData.wayland.appId && DesktopEntries.heuristicLookup(windowRect.modelData.wayland.appId);
                                                         return Quickshell.iconPath(entry && entry.icon, "application-x-executable");
                                                     }
-                                                    width: 16
-                                                    height: 16
+                                                    implicitWidth: 16
+                                                    implicitHeight: 16
                                                     anchors.centerIn: parent
                                                 }
 
