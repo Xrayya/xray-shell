@@ -1,5 +1,6 @@
+pragma ComponentBehavior: Bound
+
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Widgets
@@ -55,15 +56,15 @@ ShellRoot {
                 var total = user + nice + system + idle + iowait + irq + softirq;
                 var idleTime = idle + iowait;
 
-                if (lastCpuTotal > 0) {
-                    var totalDiff = total - lastCpuTotal;
-                    var idleDiff = idleTime - lastCpuIdle;
+                if (root.lastCpuTotal > 0) {
+                    var totalDiff = total - root.lastCpuTotal;
+                    var idleDiff = idleTime - root.lastCpuIdle;
                     if (totalDiff > 0) {
-                        cpuUsage = Math.round(100 * (totalDiff - idleDiff) / totalDiff);
+                        root.cpuUsage = Math.round(100 * (totalDiff - idleDiff) / totalDiff);
                     }
                 }
-                lastCpuTotal = total;
-                lastCpuIdle = idleTime;
+                root.lastCpuTotal = total;
+                root.lastCpuIdle = idleTime;
             }
         }
         Component.onCompleted: running = true
@@ -80,7 +81,7 @@ ShellRoot {
                 var parts = data.trim().split(/\s+/);
                 var total = parseInt(parts[1]) || 1;
                 var used = parseInt(parts[2]) || 0;
-                memUsage = Math.round(100 * used / total);
+                root.memUsage = Math.round(100 * used / total);
             }
         }
         Component.onCompleted: running = true
@@ -96,7 +97,7 @@ ShellRoot {
                     return;
                 var match = data.match(/Volume:\s*([\d.]+)/);
                 if (match) {
-                    volumeLevel = Math.round(parseFloat(match[1]) * 100);
+                    root.volumeLevel = Math.round(parseFloat(match[1]) * 100);
                 }
             }
         }
@@ -110,7 +111,7 @@ ShellRoot {
         stdout: SplitParser {
             onRead: data => {
                 if (data && data.trim()) {
-                    activeWindow = data.trim();
+                    root.activeWindow = data.trim();
                 }
             }
         }
@@ -125,7 +126,7 @@ ShellRoot {
             onRead: data => {
                 if (!data)
                     return;
-                batteryLevel = parseInt(data.trim()) || 0;
+                root.batteryLevel = parseInt(data.trim()) || 0;
             }
         }
         Component.onCompleted: running = true
@@ -138,7 +139,7 @@ ShellRoot {
             onRead: data => {
                 if (!data)
                     return;
-                batteryStatus = data.trim();
+                root.batteryStatus = data.trim();
             }
         }
         Component.onCompleted: running = true
@@ -158,11 +159,42 @@ ShellRoot {
         }
     }
 
-    // Event-based updates for window/layout (instant)
+    function dumpObject(obj, depth = 0) {
+        if (depth > 4) // avoid infinite recursion
+            return '[MaxDepth]';
+        if (obj === null)
+            return 'null';
+        if (typeof obj !== 'object')
+            return obj;
+        let out = '{ ';
+        for (let k in obj) {
+            try {
+                out += k + ': ';
+                if (typeof obj[k] === 'object' && obj[k] !== null)
+                    out += dumpObject(obj[k], depth + 1);
+                else
+                    out += obj[k];
+                out += ', ';
+            } catch (e) {
+                out += k + ': [unreadable], ';
+            }
+        }
+        out += '}';
+        return out;
+    }
+
     Connections {
         target: Hyprland
         function onRawEvent(event) {
+            Hyprland.refreshToplevels();
             windowProc.running = true;
+        }
+    }
+
+    Connections {
+        target: DesktopEntries
+        function applicationsChanged() {
+            Hyprland.refreshToplevels();
         }
     }
 
@@ -208,7 +240,7 @@ ShellRoot {
                     spacing: 0
 
                     Text {
-                        text: activeWindow
+                        text: root.activeWindow
                         color: root.colPurple
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
@@ -229,12 +261,17 @@ ShellRoot {
                         spacing: 6
 
                         Repeater {
-                            model: Hyprland.workspaces
+                            model: {
+                                return Hyprland.workspaces;
+                            }
 
                             Rectangle {
+                                id: workspaceRect
                                 implicitWidth: workspaceRow.implicitWidth
-                                implicitHeight: parent.height
+                                Layout.fillHeight: true
                                 color: "transparent"
+
+                                required property var modelData
 
                                 RowLayout {
                                     id: workspaceRow
@@ -243,7 +280,7 @@ ShellRoot {
                                     spacing: 4
 
                                     Text {
-                                        text: `${modelData.id}:`
+                                        text: `${workspaceRect.modelData.id}:`
                                         color: root.colCyan
                                         font.pixelSize: root.fontSize
                                         font.family: root.fontFamily
@@ -256,23 +293,26 @@ ShellRoot {
 
                                         Repeater {
                                             model: {
-                                                return modelData.toplevels.values ? modelData.toplevels.values.slice().sort((a, b) => {
-                                                    var aValue = a.lastIpcObject && a.lastIpcObject.at && a.lastIpcObject.at[0] ? a.lastIpcObject.at[0] : 0;
-                                                    var bValue = b.lastIpcObject && b.lastIpcObject.at && b.lastIpcObject.at[0] ? b.lastIpcObject.at[0] : 0;
-                                                    var score = aValue - bValue;
-                                                    return score != 0 ? score : bValue - aValue;
+                                                return workspaceRect.modelData.toplevels.values ? workspaceRect.modelData.toplevels.values.slice().sort((a, b) => {
+                                                    const aValue = a.lastIpcObject && a.lastIpcObject.at && a.lastIpcObject.at[0] ? a.lastIpcObject.at[0] : 0;
+                                                    const bValue = b.lastIpcObject && b.lastIpcObject.at && b.lastIpcObject.at[0] ? b.lastIpcObject.at[0] : 0;
+                                                    const score = aValue - bValue;
+                                                    return score !== 0 ? score : bValue - aValue;
                                                 }) : [];
                                             }
 
                                             Rectangle {
+                                                id: windowRect
                                                 implicitWidth: appIcon.width
-                                                implicitHeight: parent.height
+                                                Layout.fillHeight: true
                                                 color: "transparent"
+
+                                                required property var modelData
 
                                                 IconImage {
                                                     id: appIcon
                                                     source: {
-                                                        var entry = modelData.wayland && modelData.wayland.appId && DesktopEntries.heuristicLookup(modelData.wayland.appId);
+                                                        const entry = windowRect.modelData.wayland && windowRect.modelData.wayland.appId && DesktopEntries.heuristicLookup(windowRect.modelData.wayland.appId);
                                                         return Quickshell.iconPath(entry && entry.icon, "application-x-executable");
                                                     }
                                                     width: 16
@@ -286,13 +326,13 @@ ShellRoot {
                                                     anchors.bottomMargin: 3
                                                     height: 2
                                                     width: parent.implicitWidth * 0.5
-                                                    color: modelData.activated ? root.colYellow : "transparent"
+                                                    color: windowRect.modelData.activated ? root.colYellow : "transparent"
                                                 }
 
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     cursorShape: Qt.PointingHandCursor
-                                                    onClicked: Hyprland.dispatch("focuswindow address:0x" + modelData.address)
+                                                    onClicked: Hyprland.dispatch("focuswindow address:0x" + windowRect.modelData.address)
                                                 }
                                             }
                                         }
@@ -302,7 +342,7 @@ ShellRoot {
                                 Rectangle {
                                     width: parent.width
                                     height: 2
-                                    color: modelData.active ? root.colPurple : "transparent"
+                                    color: workspaceRect.modelData.active ? root.colPurple : "transparent"
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.bottom: parent.bottom
                                 }
@@ -316,20 +356,12 @@ ShellRoot {
                         }
                     }
 
-                    Connections {
-                        target: Hyprland
-                        function onRawEvent(event) {
-                            Hyprland.refreshToplevels();
-                            windowProc.running = true;
-                        }
-                    }
-
                     Item {
                         Layout.fillWidth: true
                     }
 
                     Text {
-                        text: "CPU: " + cpuUsage + "%"
+                        text: "CPU: " + root.cpuUsage + "%"
                         color: root.colYellow
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
@@ -347,7 +379,7 @@ ShellRoot {
                     }
 
                     Text {
-                        text: "Mem: " + memUsage + "%"
+                        text: "Mem: " + root.memUsage + "%"
                         color: root.colCyan
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
@@ -365,7 +397,7 @@ ShellRoot {
                     }
 
                     Text {
-                        text: "Vol: " + volumeLevel + "%"
+                        text: "Vol: " + root.volumeLevel + "%"
                         color: root.colPurple
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
@@ -383,7 +415,7 @@ ShellRoot {
                     }
 
                     Text {
-                        text: `Bat: ${batteryLevel}% (${batteryStatus})`
+                        text: `Bat: ${root.batteryLevel}% (${root.batteryStatus})`
                         color: root.colYellow
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
