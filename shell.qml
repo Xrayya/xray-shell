@@ -260,7 +260,8 @@ ShellRoot {
 
                                     Text {
                                         text: `${workspaceRect.modelData.id}:`
-                                        color: root.colCyan
+                                        // color: root.colCyan
+                                        color: workspaceRect.modelData.active ? root.colCyan : root.colMuted
                                         font.pixelSize: root.fontSize
                                         font.family: root.fontFamily
                                         font.bold: true
@@ -290,8 +291,12 @@ ShellRoot {
                                                 IconImage {
                                                     id: appIcon
                                                     source: {
+                                                      // console.log("Looking up icon for", windowRect.modelData.wayland?.appId);
+                                                      // console.log("Desktop entry data:", dumpObject(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId)));
+                                                      // console.log("Icon path:", Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, true));
                                                         return Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, "application-x-executable");
                                                     }
+                                                    backer.opacity: windowRect.modelData.activated ? 1 : 0.5
                                                     asynchronous: true
                                                     implicitWidth: 16
                                                     implicitHeight: 16
@@ -310,7 +315,7 @@ ShellRoot {
                                                 MouseArea {
                                                     anchors.fill: parent
                                                     cursorShape: Qt.PointingHandCursor
-                                                    onClicked: Hyprland.dispatch("focuswindow address:0x" + windowRect.modelData.address)
+                                                    onClicked: Hyprland.dispatch(`focuswindow address:0x${windowRect.modelData.address}`)
                                                 }
                                             }
                                         }
