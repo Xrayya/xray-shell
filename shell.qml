@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Widgets
 import Quickshell.Services.Pipewire
+import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
 
@@ -188,6 +189,8 @@ ShellRoot {
         return out;
     }
 
+    // ReloadPopup {}
+    //
     Variants {
         model: Quickshell.screens
 
@@ -291,9 +294,9 @@ ShellRoot {
                                                 IconImage {
                                                     id: appIcon
                                                     source: {
-                                                      // console.log("Looking up icon for", windowRect.modelData.wayland?.appId);
-                                                      // console.log("Desktop entry data:", dumpObject(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId)));
-                                                      // console.log("Icon path:", Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, true));
+                                                        // console.log("Looking up icon for", windowRect.modelData.wayland?.appId);
+                                                        // console.log("Desktop entry data:", dumpObject(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId)));
+                                                        // console.log("Icon path:", Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, true));
                                                         return Quickshell.iconPath(DesktopEntries.heuristicLookup(windowRect.modelData.wayland?.appId || "")?.icon, "application-x-executable");
                                                     }
                                                     backer.opacity: windowRect.modelData.activated ? 1 : 0.5
