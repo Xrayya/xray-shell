@@ -393,7 +393,7 @@ ShellRoot {
 
                     Text {
                         id: clockText
-                        text: Qt.formatDateTime(systemClock.date, "HH:mm - MMM dd")
+                        text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm AP")
                         color: root.colCyan
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
