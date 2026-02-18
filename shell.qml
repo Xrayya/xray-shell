@@ -30,8 +30,6 @@ ShellRoot {
     property int cpuUsage: 0
     property int memUsage: 0
     property int volumeLevel: 0
-    property int batteryLevel: 0
-    property string batteryStatus: "Unknown"
     property string activeWindow: "Window"
 
     // CPU tracking
@@ -106,33 +104,6 @@ ShellRoot {
         Component.onCompleted: running = true
     }
 
-    // Battery level
-    Process {
-        id: batteryProc
-        command: ["sh", "-c", "cat /sys/class/power_supply/BAT0/capacity"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data)
-                    return;
-                root.batteryLevel = parseInt(data.trim()) || 0;
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
-    Process {
-        id: batteryStatusProc
-        command: ["sh", "-c", "cat /sys/class/power_supply/BAT0/status"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data)
-                    return;
-                root.batteryStatus = data.trim();
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
     // Slow timer for system stats
     Timer {
         interval: 2000
@@ -142,8 +113,6 @@ ShellRoot {
             cpuProc.running = true;
             memProc.running = true;
             volProc.running = true;
-            batteryProc.running = true;
-            batteryStatusProc.running = true;
         }
     }
 
@@ -401,8 +370,8 @@ ShellRoot {
                     }
 
                     Text {
-                        text: `Bat: ${root.batteryLevel}% (${root.batteryStatus})`
-                        color: root.colYellow
+                        text: `Bat: ${UPower.displayDevice.percentage * 100}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
+                        color: UPower.displayDevice.percentage <= 0.2 ? root.colRed : UPower.displayDevice.state === 4 || UPower.displayDevice.state === 3 ? root.colCyan : root.colBlue
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
                         font.bold: true
