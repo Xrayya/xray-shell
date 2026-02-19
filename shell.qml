@@ -370,7 +370,7 @@ ShellRoot {
                     }
 
                     Text {
-                        text: `Bat: ${UPower.displayDevice.percentage * 100}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
+                        text: `Bat: ${Math.round(UPower.displayDevice.percentage * 100)}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
                         color: UPower.displayDevice.percentage <= 0.2 ? root.colRed : UPower.displayDevice.state === 4 || UPower.displayDevice.state === 3 ? root.colCyan : root.colBlue
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
@@ -393,7 +393,7 @@ ShellRoot {
 
                     Text {
                         id: clockText
-                        text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm AP")
+                        text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm")
                         color: root.colCyan
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
