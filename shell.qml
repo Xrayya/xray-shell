@@ -9,6 +9,7 @@ import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import org.kde.kirigami as Kirigami
 
 ShellRoot {
     id: root
@@ -332,17 +333,19 @@ ShellRoot {
                                                         Rectangle {
                                                             id: windowTooltipRect
                                                             color: root.colBg
-                                                            radius: 4
+                                                            radius: Kirigami.Units.cornerRadius
                                                             border.width: 1
                                                             border.color: root.colCyan
 
-                                                            implicitWidth: windowTooltipText.implicitWidth + 8
-                                                            implicitHeight: windowTooltipText.implicitHeight + 8
+                                                            implicitWidth: windowTooltipText.implicitWidth
+                                                            implicitHeight: windowTooltipText.implicitHeight
+
+                                                            MarginWrapperManager {
+                                                                margin: 4
+                                                            }
 
                                                             Text {
                                                                 id: windowTooltipText
-                                                                x: 4
-                                                                y: 4
                                                                 text: windowRect.modelData.title
                                                                 color: root.colCyan
                                                             }
