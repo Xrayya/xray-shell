@@ -196,9 +196,9 @@ ShellRoot {
                 // loaded in the foreground
                 PopupWindow {
                     // position the popup above the button
-                    parentWindow: barPanel
-                    relativeX: barPanel.width / 2 - width / 2
-                    relativeY: barPanel.height + 5
+                    anchor.window: barPanel
+                    anchor.rect.x: barPanel.width / 2 - width / 2
+                    anchor.rect.y: barPanel.height + 5
 
                     // some heavy component here
 
@@ -207,8 +207,8 @@ ShellRoot {
                         color: root.colPurple
                     }
 
-                    width: 200
-                    height: 200
+                    implicitWidth: 200
+                    implicitHeight: 200
                 }
             }
 
@@ -281,12 +281,7 @@ ShellRoot {
 
                                         Repeater {
                                             model: {
-                                                return workspaceRect.modelData.toplevels.values?.slice().sort((a, b) => {
-                                                    const aValue = a.lastIpcObject?.at?.[0] || 0;
-                                                    const bValue = b.lastIpcObject?.at?.[0] || 0;
-                                                    const score = aValue - bValue;
-                                                    return score !== 0 ? score : bValue - aValue;
-                                                }) || [];
+                                                return workspaceRect.modelData.toplevels.values?.slice().sort((a, b) => (a.lastIpcObject?.at?.[0] || 0) - (b.lastIpcObject?.at?.[0] || 0)) || [];
                                             }
 
                                             Rectangle {
@@ -321,10 +316,60 @@ ShellRoot {
                                                     color: windowRect.modelData.activated ? root.colYellow : "transparent"
                                                 }
 
+                                                LazyLoader {
+                                                    id: windowTooltipLoader
+
+                                                    // start loading immediately
+                                                    loading: true
+
+                                                    // this window will be loaded in the background during spare
+                                                    // frame time unless active is set to true, where it will be
+                                                    // loaded in the foreground
+                                                    PopupWindow {
+                                                        // position the popup above the button
+                                                        anchor.window: barPanel
+                                                        anchor.item: windowRect
+                                                        anchor.rect.x: windowRect.width / 2 - width / 2
+                                                        anchor.rect.y: barPanel.height + 5
+                                                        color: "transparent"
+
+                                                        implicitWidth: windowTooltipRect.implicitWidth + windowTooltipRect.border.width * 2
+                                                        implicitHeight: windowTooltipRect.implicitHeight + windowTooltipRect.border.width * 2
+
+                                                        Rectangle {
+                                                            id: windowTooltipRect
+                                                            color: root.colBg
+                                                            radius: 4
+                                                            border.width: 1
+                                                            border.color: root.colCyan
+
+                                                            implicitWidth: windowTooltipText.implicitWidth + 8
+                                                            implicitHeight: windowTooltipText.implicitHeight + 8
+
+                                                            Text {
+                                                                id: windowTooltipText
+                                                                x: 4
+                                                                y: 4
+                                                                text: windowRect.modelData.title
+                                                                color: root.colCyan
+                                                                font.pixelSize: root.fontSize
+                                                                font.family: root.fontFamily
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
                                                 MouseArea {
                                                     anchors.fill: parent
+                                                    hoverEnabled: true
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: Hyprland.dispatch(`focuswindow address:0x${windowRect.modelData.address}`)
+                                                    onEntered: () => {
+                                                        windowTooltipLoader.item.visible = true;
+                                                    }
+                                                    onExited: () => {
+                                                        windowTooltipLoader.item.visible = false;
+                                                    }
                                                 }
                                             }
                                         }
