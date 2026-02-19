@@ -182,32 +182,32 @@ ShellRoot {
                 right: 0
             }
 
-            LazyLoader {
-                id: popupLoader
-
-                // start loading immediately
-                loading: true
-
-                // this window will be loaded in the background during spare
-                // frame time unless active is set to true, where it will be
-                // loaded in the foreground
-                PopupWindow {
-                    // position the popup above the button
-                    anchor.window: barPanel
-                    anchor.rect.x: barPanel.width / 2 - width / 2
-                    anchor.rect.y: barPanel.height + 5
-
-                    // some heavy component here
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: root.colPurple
-                    }
-
-                    implicitWidth: 200
-                    implicitHeight: 200
-                }
-            }
+            // LazyLoader {
+            //     id: popupLoader
+            //
+            //     // start loading immediately
+            //     loading: true
+            //
+            //     // this window will be loaded in the background during spare
+            //     // frame time unless active is set to true, where it will be
+            //     // loaded in the foreground
+            //     PopupWindow {
+            //         // position the popup above the button
+            //         anchor.window: barPanel
+            //         anchor.rect.x: barPanel.width / 2 - width / 2
+            //         anchor.rect.y: barPanel.height + 5
+            //
+            //         // some heavy component here
+            //
+            //         Rectangle {
+            //             anchors.fill: parent
+            //             color: root.colPurple
+            //         }
+            //
+            //         implicitWidth: 200
+            //         implicitHeight: 200
+            //     }
+            // }
 
             Rectangle {
                 anchors.fill: parent
@@ -217,13 +217,13 @@ ShellRoot {
                     anchors.fill: parent
                     spacing: 0
 
-                    Button {
-                        text: "show popup"
-
-                        // accessing popupLoader.item will force the loader to
-                        // finish loading on the UI thread if it isn't finished yet.
-                        onClicked: popupLoader.item.visible = !popupLoader.item.visible
-                    }
+                    // Button {
+                    //     text: "show popup"
+                    //
+                    //     // accessing popupLoader.item will force the loader to
+                    //     // finish loading on the UI thread if it isn't finished yet.
+                    //     onClicked: popupLoader.item.visible = !popupLoader.item.visible
+                    // }
 
                     Text {
                         text: Hyprland.activeToplevel?.title || ""
@@ -461,7 +461,7 @@ ShellRoot {
 
                     Text {
                         id: clockText
-                        text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm")
+                        text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm AP")
                         color: root.colCyan
                         font.bold: true
                         Layout.rightMargin: 8
