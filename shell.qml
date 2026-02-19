@@ -23,10 +23,6 @@ ShellRoot {
     property color colYellow: "#e0af68"
     property color colBlue: "#7aa2f7"
 
-    // Font
-    property string fontFamily: "Noto Sans"
-    property int fontSize: 12
-
     // System info properties
     property int cpuUsage: 0
     property int memUsage: 0
@@ -232,7 +228,6 @@ ShellRoot {
                         text: Hyprland.activeToplevel?.title || ""
                         color: root.colPurple
                         // font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.fillWidth: true
                         Layout.maximumWidth: 400
@@ -271,8 +266,6 @@ ShellRoot {
                                         text: `${workspaceRect.modelData.id}:`
                                         // color: root.colCyan
                                         color: workspaceRect.modelData.active ? root.colCyan : root.colMuted
-                                        font.pixelSize: root.fontSize
-                                        font.family: root.fontFamily
                                         font.bold: true
                                     }
 
@@ -352,8 +345,6 @@ ShellRoot {
                                                                 y: 4
                                                                 text: windowRect.modelData.title
                                                                 color: root.colCyan
-                                                                font.pixelSize: root.fontSize
-                                                                font.family: root.fontFamily
                                                             }
                                                         }
                                                     }
@@ -400,8 +391,6 @@ ShellRoot {
                     Text {
                         text: "CPU: " + root.cpuUsage + "%"
                         color: root.colYellow
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
                     }
@@ -418,8 +407,6 @@ ShellRoot {
                     Text {
                         text: "Mem: " + root.memUsage + "%"
                         color: root.colCyan
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
                     }
@@ -436,8 +423,6 @@ ShellRoot {
                     Text {
                         text: `Vol: ${Math.floor((Pipewire.preferredDefaultAudioSink?.audio.volume || 0) * 100)}%`
                         color: root.colPurple
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
                     }
@@ -454,8 +439,6 @@ ShellRoot {
                     Text {
                         text: `Bat: ${Math.round(UPower.displayDevice.percentage * 100)}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
                         color: UPower.displayDevice.state === 4 || UPower.displayDevice.state === 1 ? root.colCyan : UPower.displayDevice.percentage <= 0.2 ? root.colRed : root.colBlue
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
                     }
@@ -477,8 +460,6 @@ ShellRoot {
                         id: clockText
                         text: Qt.formatDateTime(systemClock.date, "MMM dd - hh:mm")
                         color: root.colCyan
-                        font.pixelSize: root.fontSize
-                        font.family: root.fontFamily
                         font.bold: true
                         Layout.rightMargin: 8
                     }
