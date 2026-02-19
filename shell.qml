@@ -371,7 +371,7 @@ ShellRoot {
 
                     Text {
                         text: `Bat: ${Math.round(UPower.displayDevice.percentage * 100)}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
-                        color: UPower.displayDevice.percentage <= 0.2 ? root.colRed : UPower.displayDevice.state === 4 || UPower.displayDevice.state === 3 ? root.colCyan : root.colBlue
+                        color: UPower.displayDevice.state === 4 || UPower.displayDevice.state === 1 ? root.colCyan : UPower.displayDevice.percentage <= 0.2 ? root.colRed : root.colBlue
                         font.pixelSize: root.fontSize
                         font.family: root.fontFamily
                         font.bold: true
