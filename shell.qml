@@ -439,8 +439,15 @@ ShellRoot {
                         color: root.colMuted
                     }
 
+                    IconImage {
+                        source: Quickshell.iconPath(UPower.displayDevice.iconName)
+                        asynchronous: true
+                        implicitWidth: 20
+                        implicitHeight: 20
+                    }
+
                     Text {
-                        text: `Bat: ${Math.round(UPower.displayDevice.percentage * 100)}% (${UPowerDeviceState.toString(UPower.displayDevice.state)})`
+                        text: `${Math.round(UPower.displayDevice.percentage * 100)}%`
                         color: UPower.displayDevice.state === 4 || UPower.displayDevice.state === 1 ? root.colCyan : UPower.displayDevice.percentage <= 0.2 ? root.colRed : root.colBlue
                         font.bold: true
                         Layout.rightMargin: 8
