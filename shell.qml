@@ -8,7 +8,6 @@ import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 
 ShellRoot {
@@ -27,7 +26,6 @@ ShellRoot {
     // System info properties
     property int cpuUsage: 0
     property int memUsage: 0
-    property int volumeLevel: 0
     property string activeWindow: "Window"
 
     // CPU tracking
@@ -85,23 +83,6 @@ ShellRoot {
         Component.onCompleted: running = true
     }
 
-    // Volume level (wpctl for PipeWire)
-    Process {
-        id: volProc
-        command: ["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"]
-        stdout: SplitParser {
-            onRead: data => {
-                if (!data)
-                    return;
-                var match = data.match(/Volume:\s*([\d.]+)/);
-                if (match) {
-                    root.volumeLevel = Math.round(parseFloat(match[1]) * 100);
-                }
-            }
-        }
-        Component.onCompleted: running = true
-    }
-
     // Slow timer for system stats
     Timer {
         interval: 2000
@@ -110,7 +91,6 @@ ShellRoot {
         onTriggered: {
             cpuProc.running = true;
             memProc.running = true;
-            volProc.running = true;
         }
     }
 
