@@ -314,7 +314,7 @@ ShellRoot {
                                                     id: windowTooltipLoader
 
                                                     // start loading immediately
-                                                    loading: true
+                                                    loading: false
 
                                                     // this window will be loaded in the background during spare
                                                     // frame time unless active is set to true, where it will be
@@ -359,9 +359,11 @@ ShellRoot {
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: Hyprland.dispatch(`focuswindow address:0x${windowRect.modelData.address}`)
                                                     onEntered: () => {
+                                                        windowTooltipLoader.loading = true;
                                                         windowTooltipLoader.item.visible = true;
                                                     }
                                                     onExited: () => {
+                                                        windowTooltipLoader.loading = false;
                                                         windowTooltipLoader.item.visible = false;
                                                     }
                                                 }
