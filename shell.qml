@@ -378,11 +378,12 @@ ShellRoot {
                                     anchors.bottom: parent.bottom
                                 }
 
-                                // MouseArea {
-                                //     anchors.fill: parent
-                                //     cursorShape: Qt.PointingHandCursor
-                                //     onClicked: Hyprland.focusedWorkspace.id !== modelData.id && Hyprland.dispatch("workspace " + modelData.id)
-                                // }
+                                MouseArea {
+                                    z: -1
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: Hyprland.focusedWorkspace.id !== workspaceRect.modelData.id && Hyprland.dispatch("workspace " + workspaceRect.modelData.id)
+                                }
                             }
                         }
                     }
